@@ -12,6 +12,14 @@
 
 ### Connecting Raspberry Pi with WS212B LED Strip
 
+
+PIN 21 sygnałowy
+
+GND polaczony z rpi i zasilaczem
+
+v+ do zaislacza
+
+do wywalenia
 ![](img/RPi-LED_bb.png)
 
 ## The Hardware
