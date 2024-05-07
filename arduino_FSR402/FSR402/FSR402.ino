@@ -1,4 +1,3 @@
-
 #include <Wire.h>
 
 #define NUMBER_OF_WEIGHTS 4
@@ -23,6 +22,8 @@ void loop() {
   for (int i = 0; i < NUMBER_OF_WEIGHTS; i++) {
     values[i] = analogRead(i);
   }
+}
+
 
 
 
