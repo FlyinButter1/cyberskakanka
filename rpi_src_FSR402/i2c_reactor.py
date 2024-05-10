@@ -16,11 +16,11 @@ from enum import Enum
 
 class arrow(Enum):
 
-    right = 0
+    up = 0
 
-    down = 1
+    right = 1
 
-    up = 2
+    down = 2
 
     left = 3
 
