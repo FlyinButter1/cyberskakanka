@@ -16,22 +16,22 @@ from enum import Enum
 
 class arrow(Enum):
 
-    left = 0
+    right = 0
 
-    up = 1
+    down = 1
 
-    down = 2
+    up = 2
 
-    right = 3
+    left = 3
 
-led_per_square = 30
+led_per_square = 60
 
-pixels = neopixel.NeoPixel(board.D18, 10 * led_per_square, auto_write=False, pixel_order=neopixel.GRB)
+pixels = neopixel.NeoPixel(board.D21, 4 * led_per_square, auto_write=False, pixel_order=neopixel.GRB)
 
 bus = SMBus(1) # indicates /dev/ic2-1
 addrs = board.I2C().scan()
 
-port = serial.Serial("/dev/ttyS0", baudrate=115200) # ttyAMA0 for RPi 3
+port = serial.Serial("/dev/serial0", baudrate=115200, timeout=0.01) # ttyAMA0 for RPi 3
 
 def clear_led():
     pixels.fill((0,0,0))
@@ -41,34 +41,56 @@ def set_led(index, color):
     for i in range(index * led_per_square, (index+1) * led_per_square):
         pixels[i] = color
 
+is_pressed = [False, False ,False, False]
+
+
 def main():
     clear_led()
     while True:
-        time.sleep(0.1)
         
         for addr in addrs:
-            v = bus.read_i2c_block_data(addr, 0, 16)
-            v = struct.unpack('ffff', bytearray(v))
-            print(addr, v)
+            # podejście na chama 
+            # nie wiem czemu działa 😭😭
+            while True:
+                try:
+                    v = bus.read_i2c_block_data(addr, 0, 16)
+                    v = struct.unpack('ffff', bytearray(v))
+                    break
 
-            for i in v:
-                if i > 800:    
-                    port.write(arrow(i).name)
-                    
-        for line in port.read():
-            line = port.readline()
+                except:
+                    print("blad")
+                    pass
 
+            # print(v)
+
+            for i in range(len(v)):
+                if v[i] > 800:
+                    if not is_pressed[i]:
+                        is_pressed[i] = True
+                        port.write(bytes(arrow(i).name, "UTF-8"))
+                else:
+                    is_pressed[i] = False
+
+        
+        for line in  port.readlines():
+            line = line.decode()
             color_data = line.split()
-
-            # read color data
-            if color_data[1] == 'perfect':
-                color = (0, 255, 0)
-                pass
-
+            color = (int(color_data[1]), int(color_data[2]), int(color_data[3]))
             set_led(arrow[color_data[0]].value, color)
+            pixels.show()
+
+
+
+        # for line in port.read():
+        #     if line:
+        #         line = port.readline()
+        #         print(line)
+        #         color_data = line.decode().split()
+        #         # color_data - tablica z kierunkiem strzalki i rgb
+
             
 
-        pixels.show()
+        
 
 if __name__ == '__main__':
     main()
