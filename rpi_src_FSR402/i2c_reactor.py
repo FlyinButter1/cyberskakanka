@@ -18,11 +18,11 @@ class arrow(Enum):
 
     up = 0
 
-    right = 1
+    left = 1
 
     down = 2
 
-    left = 3
+    right = 3
 
 led_per_square = 60
 
@@ -31,7 +31,7 @@ pixels = neopixel.NeoPixel(board.D21, 4 * led_per_square, auto_write=False, pixe
 bus = SMBus(1) # indicates /dev/ic2-1
 addrs = board.I2C().scan()
 
-port = serial.Serial("/dev/serial0", baudrate=115200, timeout=0.01) # ttyAMA0 for RPi 3
+port = serial.Serial("/dev/serial0", baudrate=115200, timeout=0.001) # ttyAMA0 for RPi 3
 
 def clear_led():
     pixels.fill((0,0,0))
@@ -64,7 +64,7 @@ def main():
             # print(v)
 
             for i in range(len(v)):
-                if v[i] > 800:
+                if v[i] > 700:
                     if not is_pressed[i]:
                         is_pressed[i] = True
                         port.write(bytes(arrow(i).name, "UTF-8"))
